@@ -12,8 +12,6 @@ const company = [
   { href: "/#work", label: "Selected work" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
-  { href: "/privacy-policy", label: "Privacy Policy" },
-  { href: "/terms", label: "Terms of Use" },
 ];
 
 // lucide v1 dropped brand glyphs, so these are inline paths.
