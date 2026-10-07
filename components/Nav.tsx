@@ -28,12 +28,6 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
-/** Kept out of the main row, grouped under a small "Legal" dropdown. */
-const legal = [
-  { href: "/privacy-policy", label: "Privacy Policy" },
-  { href: "/terms", label: "Terms of Use" },
-];
-
 export function Nav() {
   const { scrollYProgress, scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
@@ -96,39 +90,6 @@ export function Nav() {
                   {l.label}
                 </a>
               ))}
-              {/* Legal dropdown, opens on hover and on keyboard focus */}
-              <div className="group relative">
-                <button
-                  type="button"
-                  aria-haspopup="true"
-                  className="inline-flex items-center gap-1 hover:text-ink transition group-focus-within:text-ink"
-                >
-                  Legal
-                  <svg
-                    aria-hidden
-                    viewBox="0 0 12 12"
-                    className="h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path d="M3 4.5 6 7.5 9 4.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                <div className="invisible absolute right-0 top-full pt-3 opacity-0 translate-y-1 transition-all duration-300 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0">
-                  <div className="min-w-[190px] rounded-2xl border border-border bg-cream p-2 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.25)]">
-                    {legal.map((l) => (
-                      <a
-                        key={l.href}
-                        href={l.href}
-                        className="block rounded-xl px-4 py-2.5 text-ink-soft transition-colors hover:bg-brand/10 hover:text-ink"
-                      >
-                        {l.label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
             </nav>
             <a href="/contact" className="hidden sm:inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-brand text-cream px-5 py-2.5 text-sm hover:opacity-90 transition">
               Get Started
@@ -201,13 +162,6 @@ export function Nav() {
               <div className="flex flex-col gap-3 items-start text-sm text-ink-soft">
                 <Clock />
                 <a href="mailto:hellothere@sortafamous.in" className="underline break-all">hellothere@sortafamous.in</a>
-                <div className="flex gap-5 text-xs">
-                  {legal.map((l) => (
-                    <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="hover:text-ink transition">
-                      {l.label}
-                    </a>
-                  ))}
-                </div>
               </div>
             </motion.div>
           </motion.div>
