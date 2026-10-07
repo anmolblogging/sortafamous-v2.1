@@ -3,54 +3,155 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Reveal } from "./Reveal";
-import { HeroOrbit } from "./HeroOrbit";
 import { SectionHeader } from "./SectionHeader";
 import { EASE } from "./motion";
 import { CAREERS_EMAIL, applyHref, jobs, type Job, type JobSection } from "@/lib/careers";
 
-export function CareersHero() {
-  return (
-    <section className="relative z-10 bg-cream pt-32 md:pt-44 pb-16 md:pb-24 px-6 md:px-12 lg:px-16 xl:px-28">
-      <div className="mx-auto grid max-w-[1480px] gap-12 lg:grid-cols-2 lg:items-center">
-        <div>
-          <Reveal>
-            <div className="eyebrow mb-6 flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Careers
-            </div>
-          </Reveal>
-          <Reveal delay={60}>
-            <h1 className="serif text-[clamp(2.5rem,6.5vw,6rem)] leading-[0.98] tracking-[-0.03em] max-w-[15ch]">
-              Help brands get <span className="serif-italic">remembered</span>
-            </h1>
-          </Reveal>
-          <Reveal delay={140}>
-            <p className="mt-8 max-w-2xl text-lg md:text-xl text-ink-soft leading-relaxed">
-              Sorta Famous helps brands be seen, heard, and remembered for the right reasons. We
-              value clear communication, thoughtful questioning, and consistent execution, and
-              we’re looking for people who care about influence over noise.
-            </p>
-          </Reveal>
-          <Reveal delay={200}>
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <a
-                href="#openings"
-                className="inline-flex items-center gap-2 rounded-full bg-ink text-cream px-6 py-3.5 text-sm hover:opacity-90 transition"
-              >
-                See open roles <span aria-hidden>→</span>
-              </a>
-              <a
-                href={`mailto:${CAREERS_EMAIL}`}
-                className="inline-flex items-center gap-2 text-sm px-3 py-3.5 hover:translate-x-1 transition"
-              >
-                {CAREERS_EMAIL} <span aria-hidden>→</span>
-              </a>
-            </div>
-          </Reveal>
-        </div>
+/** Top-line facts for each classified, picked from the role's meta. */
+function adLine(job: Job) {
+  return job.meta
+    .filter((m) => m.label === "Location" || m.label === "Experience")
+    .map((m) => m.value)
+    .join(" · ");
+}
 
-        <Reveal delay={160} className="hidden lg:block">
-          <HeroOrbit chips={["PR", "Growth", "Ops", "Finance"]} />
+/**
+ * Careers hero, set as a newspaper "Situations Vacant" page. A PR agency's
+ * world is print and placements, so the openings are run as classified ads.
+ */
+export function CareersHero() {
+  const count = String(jobs.length).padStart(2, "0");
+
+  return (
+    <section className="relative z-10 bg-cream pt-28 md:pt-36 pb-16 md:pb-24 px-6 md:px-12 lg:px-16 xl:px-28">
+      <div className="mx-auto max-w-[1480px]">
+        {/* Masthead */}
+        <Reveal>
+          <div className="border-t-[3px] border-ink pt-1">
+            <div className="border-t border-ink" />
+          </div>
+          <div className="flex items-center justify-between gap-4 py-3 text-[0.7rem] uppercase tracking-[0.18em] text-ink-soft">
+            <span>Mumbai edition</span>
+            <span className="hidden sm:inline">The careers page</span>
+            <span>{count} positions open</span>
+          </div>
+          <div className="border-t border-ink" />
         </Reveal>
+
+        <Reveal delay={60}>
+          <h1 className="serif py-6 text-center text-[clamp(3rem,11vw,10rem)] leading-[0.9] tracking-[-0.04em] md:py-8">
+            Situations <span className="serif-italic">Vacant</span>
+          </h1>
+        </Reveal>
+
+        <Reveal delay={100}>
+          <div className="border-t border-ink" />
+          <div className="border-t-[3px] border-ink mt-1" />
+        </Reveal>
+
+        <div className="mt-10 grid gap-12 md:mt-14 lg:grid-cols-12 lg:gap-0">
+          {/* Lead story */}
+          <div className="lg:col-span-7 lg:border-r lg:border-ink/20 lg:pr-12">
+            <Reveal delay={140}>
+              <div className="text-[0.7rem] uppercase tracking-[0.18em] text-brand">
+                From the hiring desk
+              </div>
+              <h2 className="serif mt-3 text-[clamp(2.2rem,4.6vw,4rem)] leading-[1.02] tracking-[-0.02em]">
+                Wanted: people who make brands famous,{" "}
+                <span className="serif-italic text-brand">for the right reasons.</span>
+              </h2>
+              <p className="mt-4 serif-italic text-lg text-ink-soft">
+                By the Sorta Famous team · Filed in Mumbai
+              </p>
+            </Reveal>
+
+            <Reveal delay={200}>
+              <div className="mt-8 gap-10 border-t border-ink/20 pt-8 text-ink-soft leading-relaxed md:columns-2">
+                <p className="first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-display first-letter:text-7xl first-letter:leading-[0.8] first-letter:text-ink">
+                  Sorta Famous helps brands be seen, heard, and remembered for the right reasons.
+                  In a crowded media environment, we work with clients to clarify their story,
+                  reach the right audiences, and build reputations that last.
+                </p>
+                <p className="mt-4">
+                  We value clear communication, thoughtful questioning, and consistent execution,
+                  and we care about meaningful influence over noise or ego. If that sounds like how
+                  you work, one of the notices on this page may have your name on it.
+                </p>
+                <p className="mt-4">
+                  Applications go straight to our people team at{" "}
+                  <a href={`mailto:${CAREERS_EMAIL}`} className="text-ink underline underline-offset-4 hover:text-brand break-all">
+                    {CAREERS_EMAIL}
+                  </a>
+                  .
+                </p>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* Classifieds column */}
+          <div className="relative lg:col-span-5 lg:pl-12">
+            {/* rotating "now hiring" stamp */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-10 right-2 z-10 hidden h-28 w-28 -rotate-12 sm:block lg:-top-14 lg:-right-4"
+            >
+              <svg viewBox="0 0 100 100" className="h-full w-full animate-[spin_24s_linear_infinite] text-brand">
+                <defs>
+                  <path id="stamp-circle" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" />
+                </defs>
+                <circle cx="50" cy="50" r="48" fill="var(--cream)" stroke="currentColor" strokeWidth="1.5" />
+                <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="1" />
+                <text fill="currentColor" fontSize="9.5" letterSpacing="2.6" fontFamily="var(--font-sans)">
+                  <textPath href="#stamp-circle">NOW HIRING · NOW HIRING · NOW HIRING ·</textPath>
+                </text>
+              </svg>
+              <span className="serif absolute inset-0 grid place-items-center text-3xl text-brand">
+                {count}
+              </span>
+            </div>
+
+            <Reveal delay={160}>
+              <div className="text-[0.7rem] uppercase tracking-[0.18em] text-ink-soft">
+                Classifieds
+              </div>
+            </Reveal>
+
+            <div className="mt-4 flex flex-col gap-4">
+              {jobs.map((job, i) => (
+                <Reveal key={job.slug} delay={200 + i * 70}>
+                  <a
+                    href={`#${job.slug}`}
+                    className="group block border border-ink p-5 transition-colors duration-300 hover:bg-brand hover:text-cream hover:border-brand"
+                  >
+                    <div className="flex items-baseline justify-between gap-4 border-b border-dashed border-current/40 pb-3">
+                      <span className="text-[0.65rem] font-semibold uppercase tracking-[0.22em]">
+                        Wanted
+                      </span>
+                      <span className="text-[0.65rem] uppercase tracking-[0.18em] opacity-60">
+                        No. {String(i + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <h3 className="serif mt-3 text-2xl leading-tight md:text-[1.7rem]">
+                      {job.title}
+                    </h3>
+                    <div className="mt-2 flex items-end justify-between gap-4">
+                      <p className="text-sm opacity-70">{adLine(job)}</p>
+                      <span className="serif-italic shrink-0 text-sm">
+                        Apply within{" "}
+                        <span
+                          aria-hidden
+                          className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+                        >
+                          →
+                        </span>
+                      </span>
+                    </div>
+                  </a>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -127,10 +228,16 @@ function Section({ section }: { section: JobSection }) {
 export function Openings() {
   const [open, setOpen] = useState<string | null>(null);
 
-  // Opens a role straight from a shared link such as /careers#accountant.
+  // Opens a role from a link such as /careers#accountant, on load and when a
+  // classified in the hero is clicked.
   useEffect(() => {
-    const hash = window.location.hash.slice(1);
-    if (jobs.some((j) => j.slug === hash)) setOpen(hash);
+    const openFromHash = () => {
+      const hash = window.location.hash.slice(1);
+      if (jobs.some((j) => j.slug === hash)) setOpen(hash);
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
   }, []);
 
   return (
