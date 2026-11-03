@@ -46,11 +46,9 @@ export interface SEOData {
   title?: string;
   description?: string;
   keywords?: string;
-  canonicalUrl?: string;
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
-  schema?: any;
 }
 
 export interface BlogPost {
@@ -61,6 +59,7 @@ export interface BlogPost {
   excerpt: string;
   featuredImageUrl: string | null;
   publishedDate: string;
+  modifiedDate: string;
   formattedDate: string;
   readTime: string;
   author: Author;
@@ -84,8 +83,9 @@ export async function getBlogPosts(options?: {
   if (options?.tagId) url += `&tags=${options.tagId}`;
   if (options?.search) url += `&search=${encodeURIComponent(options.search)}`;
  
-  const res = await fetch(url, { next: { revalidate: 60 } });
-  if (!res.ok) return { posts: [], total: 0, totalPages: 0 };
+  let res = await fetch(url, { next: { revalidate: 60 } }).catch(() => null);
+  if (!res?.ok) res = await fetch(url, { next: { revalidate: 60 } }).catch(() => null);
+  if (!res?.ok) return { posts: [], total: 0, totalPages: 0 };
  
   const total = Number(res.headers.get('X-WP-Total') || 0);
   const totalPages = Number(res.headers.get('X-WP-TotalPages') || 1);
@@ -95,12 +95,18 @@ export async function getBlogPosts(options?: {
 }
  
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
-  const res = await fetch(`${WP_API_BASE}/posts?_embed=1&slug=${encodeURIComponent(slug)}`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) return null;
-  const raw = await res.json();
-  return raw.length ? normalizePost(raw[0]) : null;
+  const url = `${WP_API_BASE}/posts?_embed=1&slug=${encodeURIComponent(slug)}`;
+  // A CMS hiccup must not be cached as a 404 for a real post, so retry, then
+  // throw: a failed build or revalidation keeps serving the last good page.
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(url, { next: { revalidate: 60 } }).catch(() => null);
+    if (res?.ok) {
+      const raw = await res.json();
+      return raw.length ? normalizePost(raw[0]) : null;
+    }
+    if (attempt === 3) throw new Error(`CMS request failed for post "${slug}" (${res?.status ?? 'network error'})`);
+    await new Promise((r) => setTimeout(r, 500 * attempt));
+  }
 }
 
 function formatDate(iso?: string | null): string {
@@ -115,7 +121,8 @@ function readingTime(html: string): string {
  
 export function normalizePost(item: any): BlogPost {
   const title = stripHtml(item.title?.rendered || `Post ${item.id}`);
-  let contentHtml = item.content?.rendered || '';
+  // The page title is the only H1, so headings typed as H1 in the CMS become H2.
+  let contentHtml = (item.content?.rendered || '').replace(/<(\/?)h1(\s|>)/gi, '<$1h2$2');
   const excerptSource = stripHtml(item.excerpt?.rendered || contentHtml);
   const excerpt = excerptSource.slice(0, 160) + (excerptSource.length > 160 ? '…' : '');
   
@@ -157,13 +164,14 @@ export function normalizePost(item: any): BlogPost {
     contentHtml,
     excerpt,
     featuredImageUrl,
-    publishedDate: item.date,
+    publishedDate: item.date_gmt ? `${item.date_gmt}Z` : item.date,
+    modifiedDate: item.modified_gmt ? `${item.modified_gmt}Z` : item.modified || item.date,
     formattedDate: formatDate(item.date),
     readTime: readingTime(contentHtml),
     author,
     categories,
     tags,
-    seo: extractSeo(item, title, 'Article', excerpt),
+    seo: extractSeo(item, title, excerpt),
   };
 }
 
@@ -199,36 +207,25 @@ export function categoriesFromPosts(posts: BlogPost[]): TaxonomyTerm[] {
   return [...counts.values()].sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
 }
 
-function rewriteDomain(value: string): string {
-  return value.replace(/https?:\/\/cms\.sortafamous\.in/gi, 'https://sortafamous.in');
-}
- 
-function rewriteSchemaDomain(schema: any): any {
-  if (!schema) return undefined;
-  try {
-    return JSON.parse(rewriteDomain(JSON.stringify(schema)));
-  } catch {
-    return schema;
-  }
-}
- 
-export function extractSeo(item: any, fallbackTitle = '', fallbackType = '', fallbackDesc = ''): SEOData {
+// Canonical URLs and structured data are built on the site from the post slug
+// (see app/[slug]/page.tsx). The CMS versions use the WordPress permalink
+// structure, /category/slug/, which does not exist on sortafamous.in.
+export function extractSeo(item: any, fallbackTitle = '', fallbackDesc = ''): SEOData {
   const head = item?.aioseo_head_json || {};
   const meta = item?.aioseo_meta_data || {};
  
   let title = stripHtml(head.title || meta.title || fallbackTitle);
-  title = title.replace(/\s*[-|]\s*cms\.sortafamous\.in\s*$/i, '');
+  // AIOSEO appends the WordPress site name ("CMS") to some titles.
+  title = title.replace(/\s*[-|–]\s*(CMS|cms\.sortafamous\.in)\s*$/i, '');
  
   const description = stripHtml(head.description || meta.description || fallbackDesc).slice(0, 160);
  
   return {
     title,
     description,
-    keywords: typeof head.keywords === 'string' ? head.keywords : undefined,
-    canonicalUrl: head.canonical_url ? rewriteDomain(head.canonical_url) : undefined,
-    ogTitle: head['og:title'] || title,
+    keywords: typeof head.keywords === 'string' && head.keywords ? head.keywords : undefined,
+    ogTitle: stripHtml(head['og:title'] || title).replace(/\s*[-|–]\s*CMS\s*$/i, ''),
     ogDescription: head['og:description'] || description,
     ogImage: head['og:image'],
-    schema: rewriteSchemaDomain(head.schema),
   };
 }

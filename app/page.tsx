@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogDefaults } from "@/lib/site";
 import { Preloader } from "@/components/Preloader";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
@@ -23,9 +24,12 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Sorta Famous · 360° Marketing & PR Agency in India",
-  description: "Fame is earned. We manage the rest. Insight led 360° marketing, PR, brand, social and content, visibility that lasts longer than the news cycle.",
+  title: { absolute: "Sorta Famous · PR & 360° Marketing Agency in Mumbai, India" },
+  description: "PR and 360° marketing agency in Mumbai. Public relations, social media, branding and performance marketing that earns visibility beyond the news cycle.",
+  alternates: { canonical: "/" },
   openGraph: {
+    ...ogDefaults,
+    url: "/",
     title: "Sorta Famous · 360° Marketing & PR Agency",
     description: "Visibility that lasts longer than the news cycle, no clout chasing, just status with substance.",
   },

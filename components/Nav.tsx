@@ -10,7 +10,9 @@ function Logo() {
   return (
     <a href="/" aria-label="Sorta Famous, home" className="inline-flex items-center">
       <img
-        src="/new-logo-final.png"
+        src="/logo-480.webp"
+        width={480}
+        height={188}
         alt="Sorta Famous"
         className="h-7 md:h-9 w-auto select-none"
         draggable={false}

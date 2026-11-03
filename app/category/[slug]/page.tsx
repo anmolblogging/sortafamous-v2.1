@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogDefaults } from '@/lib/site';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Nav } from '@/components/Nav';
@@ -21,8 +22,10 @@ export async function generateMetadata({
   if (!currentCategory) return { title: 'Category Not Found' };
   
   return {
-    title: `${currentCategory.name} · Sorta Famous Blog`,
-    description: `Read all articles categorized under ${currentCategory.name} from the Sorta Famous team.`,
+    title: `${currentCategory.name} · Blog`,
+    description: `${currentCategory.name} guides and articles for founders, brands and businesses in India, from the Sorta Famous team in Mumbai.`,
+    alternates: { canonical: `/category/${currentCategory.slug}` },
+    openGraph: { ...ogDefaults, url: `/category/${currentCategory.slug}`, title: `${currentCategory.name} · Sorta Famous Blog` },
   };
 }
 

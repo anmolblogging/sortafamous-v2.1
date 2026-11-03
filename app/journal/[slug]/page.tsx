@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogDefaults } from "@/lib/site";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
 import { CTA } from "@/components/CTA";
@@ -20,7 +21,11 @@ export async function generateMetadata({
   return {
     title: article.title,
     description: article.excerpt,
+    alternates: { canonical: `/journal/${article.slug}` },
     openGraph: {
+      ...ogDefaults,
+      type: "article",
+      url: `/journal/${article.slug}`,
       title: `${article.title} · Sorta Famous`,
       description: article.excerpt,
       images: [article.img],
@@ -44,10 +49,10 @@ export default async function ArticlePage({
         <article className="px-6 md:px-12 lg:px-16 xl:px-28">
           <div className="mx-auto max-w-3xl pt-32 md:pt-40">
             <a
-              href="/#journal"
+              href="/blog"
               className="inline-flex items-center gap-2 text-sm text-ink-soft transition hover:text-ink"
             >
-              <span aria-hidden>←</span> Back to stories
+              <span aria-hidden>←</span> Back to blog
             </a>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-soft">

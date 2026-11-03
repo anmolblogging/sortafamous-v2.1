@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogDefaults } from "@/lib/site";
 import { Nav } from "@/components/Nav";
 import { ServicesHero } from "@/components/ServicesHero";
 import { ServicePillars } from "@/components/ServicePillars";
@@ -11,7 +12,10 @@ export const metadata: Metadata = {
   title: "Services",
   description:
     "360° marketing across PR, Social Media Marketing and Brand Management, from press placements to paid social and founder brand.",
+  alternates: { canonical: "/services" },
   openGraph: {
+    ...ogDefaults,
+    url: "/services",
     title: "Services · Sorta Famous",
     description:
       "Five connected practices, one cohesive system, PR, social, brand, performance marketing and personal branding. We craft stories that make brands matter.",

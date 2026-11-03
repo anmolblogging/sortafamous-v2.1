@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogDefaults } from "@/lib/site";
 import { LegalPage, LegalLink, type LegalSection } from "@/components/LegalPage";
 import { GRIEVANCE_OFFICER, LEGAL_ADDRESS, LEGAL_EMAIL, LEGAL_LAST_UPDATED } from "@/lib/legal";
 
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
   description:
     "How Sorta Famous collects, uses, stores, discloses and protects personal data when you use our website or interact with us.",
   alternates: { canonical: "/privacy-policy" },
+  openGraph: { ...ogDefaults, url: "/privacy-policy", title: "Privacy Policy · Sorta Famous" },
 };
 
 const mail = <LegalLink href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</LegalLink>;

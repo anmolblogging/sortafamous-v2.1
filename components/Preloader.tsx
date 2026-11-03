@@ -32,7 +32,9 @@ export function Preloader() {
           }}
         >
           <motion.img
-            src="/new-logo-final.png"
+            src="/logo-480.webp"
+            width={480}
+            height={188}
             alt="Sorta Famous"
             className="h-14 md:h-20 w-auto select-none"
             draggable={false}

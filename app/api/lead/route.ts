@@ -1,18 +1,42 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Visitor input goes into HTML emails, so it is escaped before use. */
+function escapeHtml(value: unknown, max: number): string {
+  return String(value ?? "")
+    .slice(0, max)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export async function POST(request: Request) {
   try {
     const lead = await request.json();
-    const { name, email, phone, service, details, source, submittedAt } = lead;
+    const rawEmail = String(lead.email ?? "").trim();
 
     // Basic Validation
-    if (!name || !email || !service) {
+    if (!lead.name || !rawEmail || !lead.service) {
       return NextResponse.json(
         { error: "Missing required fields (name, email, service)." },
         { status: 400 }
       );
     }
+    if (rawEmail.length > 254 || !EMAIL_RE.test(rawEmail)) {
+      return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
+    }
+
+    const name = escapeHtml(lead.name, 100);
+    const email = escapeHtml(rawEmail, 254);
+    const phone = escapeHtml(lead.phone, 30);
+    const service = escapeHtml(lead.service, 120);
+    const details = escapeHtml(lead.details, 3000);
+    const source = escapeHtml(lead.source || "website", 40);
+    const submittedAt = escapeHtml(lead.submittedAt, 40);
 
     const emailUser = process.env.EMAIL_USER?.trim();
     const emailPass = process.env.EMAIL_PASS?.trim();
@@ -209,17 +233,19 @@ export async function POST(request: Request) {
 
     // Process variables in user HTML
     userHtml = userHtml
-      .replace(/{{name}}/g, name)
-      .replace(/{{service}}/g, service)
+      .replace(/{{name}}/g, () => name)
+      .replace(/{{service}}/g, () => service)
       .replace(
         /{{phone_block}}/g,
-        phone
+        () =>
+          phone
           ? `<div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value">${phone}</span></div>`
           : ""
       )
       .replace(
         /{{details_block}}/g,
-        details
+        () =>
+          details
           ? `<div class="detail-row"><span class="detail-label">Details:</span><span class="detail-value">${details}</span></div>`
           : ""
       );
@@ -354,20 +380,22 @@ export async function POST(request: Request) {
 
     // Process variables in admin HTML
     adminHtml = adminHtml
-      .replace(/{{name}}/g, name)
-      .replace(/{{email}}/g, email)
-      .replace(/{{service}}/g, service)
-      .replace(/{{source}}/g, source)
-      .replace(/{{submittedAt}}/g, submittedAt || new Date().toLocaleString())
+      .replace(/{{name}}/g, () => name)
+      .replace(/{{email}}/g, () => email)
+      .replace(/{{service}}/g, () => service)
+      .replace(/{{source}}/g, () => source)
+      .replace(/{{submittedAt}}/g, () => submittedAt || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }))
       .replace(
         /{{phone_row}}/g,
-        phone
+        () =>
+          phone
           ? `<tr><th>Phone</th><td><a href="tel:${phone}">${phone}</a></td></tr>`
           : ""
       )
       .replace(
         /{{details_row}}/g,
-        details
+        () =>
+          details
           ? `<tr><th>Project Details</th><td><div class="details-content">${details}</div></td></tr>`
           : ""
       );
@@ -377,15 +405,15 @@ export async function POST(request: Request) {
       // Send receipt/confirmation to the inquirer
       transporter.sendMail({
         from: `"Sorta Famous" <${emailUser}>`,
-        to: email,
+        to: rawEmail,
         subject: "We've received your request! · Sorta Famous",
         html: userHtml,
       }),
-      // Send notification to Sorta Famous admin (in this case, the EMAIL_USER itself, i.e., sumitnayak2006@gmail.com)
+      // Send notification to the Sorta Famous inbox (EMAIL_USER itself)
       transporter.sendMail({
         from: `"Sorta Famous Lead Bot" <${emailUser}>`,
         to: emailUser, // Sends to self as admin
-        subject: `New Lead Alert: ${name} - ${service} (${source})`,
+        subject: `New Lead Alert: ${String(lead.name).slice(0, 100)} - ${String(lead.service).slice(0, 120)} (${source})`,
         html: adminHtml,
       }),
     ]);
@@ -394,7 +422,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Error sending emails:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to process lead form." },
+      { error: "Failed to process lead form. Please email hellothere@sortafamous.in." },
       { status: 500 }
     );
   }

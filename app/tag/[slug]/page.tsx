@@ -21,8 +21,12 @@ export async function generateMetadata({
   if (!currentTag) return { title: 'Tag Not Found' };
   
   return {
-    title: `${currentTag.name} · Sorta Famous Blog`,
-    description: `Read all articles tagged with ${currentTag.name} from the Sorta Famous team.`,
+    title: `#${currentTag.name} · Blog`,
+    description: `Articles tagged ${currentTag.name} from the Sorta Famous team.`,
+    alternates: { canonical: `/tag/${currentTag.slug}` },
+    // Tag archives are thin lists that overlap the categories; keep them out
+    // of the index but let crawlers follow through to the posts.
+    robots: { index: false, follow: true },
   };
 }
 

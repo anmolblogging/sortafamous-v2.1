@@ -12,6 +12,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  async redirects() {
+    return [
+      // One canonical host: www.sortafamous.in otherwise serves a duplicate copy.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.sortafamous.in" }],
+        destination: "https://sortafamous.in/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

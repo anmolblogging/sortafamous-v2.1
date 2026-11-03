@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogDefaults } from '@/lib/site';
 import Link from 'next/link';
 import { Nav } from '@/components/Nav';
 import { CTA } from '@/components/CTA';
@@ -7,8 +8,11 @@ import { getBlogPosts, getBlogCategories } from '@/lib/blogs';
 import { BlogList } from '@/components/BlogList';
 
 export const metadata: Metadata = {
-  title: 'Blog · Sorta Famous',
-  description: 'Insights and articles from the Sorta Famous team.',
+  title: 'Blog',
+  description:
+    'Practical guides on PR, social media marketing, brand management, performance marketing and personal branding in India, from the Sorta Famous team in Mumbai.',
+  alternates: { canonical: '/blog' },
+  openGraph: { ...ogDefaults, url: '/blog', title: 'Blog · Sorta Famous' },
 };
 
 export default async function BlogPage({

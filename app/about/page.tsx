@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogDefaults } from "@/lib/site";
 import { Nav } from "@/components/Nav";
 import { AboutHero } from "@/components/AboutHero";
 import { AboutManifesto } from "@/components/AboutManifesto";
@@ -14,7 +15,10 @@ export const metadata: Metadata = {
   title: "About us",
   description:
     "At Sorta Famous, fame is earned, not accidental. A modern PR, marketing and SEO studio helping brands shape perception, build authority, and create visibility that lasts.",
+  alternates: { canonical: "/about" },
   openGraph: {
+    ...ogDefaults,
+    url: "/about",
     title: "About us · Sorta Famous",
     description:
       "Creating meaningful visibility for modern brands, strategy over shortcuts, visibility with substance, reputation that lasts.",

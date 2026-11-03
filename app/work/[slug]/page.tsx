@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogDefaults } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
@@ -22,7 +23,10 @@ export async function generateMetadata({
   return {
     title: `${study.client} · ${study.t}`,
     description: study.summary,
+    alternates: { canonical: `/work/${study.slug}` },
     openGraph: {
+      ...ogDefaults,
+      url: `/work/${study.slug}`,
       title: `${study.client} · Sorta Famous`,
       description: study.summary,
       images: [study.cover],

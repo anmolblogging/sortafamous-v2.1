@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogDefaults } from "@/lib/site";
 import { LegalPage, LegalLink, type LegalSection } from "@/components/LegalPage";
 import { LEGAL_ADDRESS, LEGAL_EMAIL, LEGAL_LAST_UPDATED } from "@/lib/legal";
 
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
   description:
     "The terms that govern your access to and use of the Sorta Famous website, including content, intellectual property, disclaimers and liability.",
   alternates: { canonical: "/terms" },
+  openGraph: { ...ogDefaults, url: "/terms", title: "Terms of Use · Sorta Famous" },
 };
 
 const privacy = (label = "Privacy Policy") => <LegalLink href="/privacy-policy">{label}</LegalLink>;

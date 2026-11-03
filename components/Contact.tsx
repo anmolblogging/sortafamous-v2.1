@@ -32,7 +32,8 @@ type Values = { name: string; email: string; service: string; details: string };
 
 const EMPTY: Values = { name: "", email: "", service: "", details: "" };
 
-export function Contact() {
+/** `isPage` makes the section heading the page's H1, for the standalone /contact page. */
+export function Contact({ isPage = false }: { isPage?: boolean }) {
   const [values, setValues] = useState<Values>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
   const [formError, setFormError] = useState("");
@@ -88,6 +89,7 @@ export function Contact() {
         <SectionHeader
           eyebrow="Get in touch"
           title="Let's talk"
+          as={isPage ? "h1" : "h2"}
           className="mb-12"
         />
 
@@ -97,7 +99,7 @@ export function Contact() {
             <div className="relative rounded-[2rem] overflow-hidden min-h-[720px] lg:h-full flex flex-col justify-between p-8 md:p-10 bg-ink-gradient">
               <img
                 src="/images/art/scene1.jpg"
-                alt=""
+                alt="Classical landscape painting with a rainbow over a hilltop town and sea"
                 loading="lazy"
                 className="absolute inset-0 h-full w-full object-cover"
               />

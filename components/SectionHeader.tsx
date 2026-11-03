@@ -15,12 +15,15 @@ export function SectionHeader({
   marker,
   dark = false,
   className = "",
+  as: Heading = "h2",
 }: {
   eyebrow: ReactNode;
   title: ReactNode;
   marker?: ReactNode;
   dark?: boolean;
   className?: string;
+  /** Use "h1" when the section is the page's main heading. */
+  as?: "h1" | "h2";
 }) {
   return (
     <div className={`flex items-end justify-between gap-6 ${className}`}>
@@ -28,7 +31,7 @@ export function SectionHeader({
         <div className={`eyebrow mb-3 flex items-center gap-2 ${dark ? "text-cream/50" : ""}`}>
           <span className="h-1.5 w-1.5 rounded-full bg-accent" /> {eyebrow}
         </div>
-        <h2 className={`serif text-4xl md:text-6xl ${dark ? "text-cream" : ""}`}>{title}</h2>
+        <Heading className={`serif text-4xl md:text-6xl ${dark ? "text-cream" : ""}`}>{title}</Heading>
       </Reveal>
       {marker && (
         <Reveal delay={80}>

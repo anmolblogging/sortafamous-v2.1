@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { Reveal } from "./Reveal";
 import { EASE } from "./motion";
@@ -25,6 +25,16 @@ const faqs = [
   },
 ];
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
 export function FAQ() {
   const [open, setOpen] = useState(-1);
 
@@ -33,6 +43,7 @@ export function FAQ() {
       id="faq"
       className="relative z-[135] bg-cream px-6 md:px-12 lg:px-16 xl:px-28 py-16 md:py-28 border-t border-border"
     >
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div className="mx-auto max-w-[1480px]">
         <SectionHeader
           eyebrow="Questions"
@@ -64,21 +75,18 @@ export function FAQ() {
                     </span>
                   </button>
 
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.5, ease: EASE }}
-                        className="overflow-hidden"
-                      >
-                        <p className="text-ink-soft text-lg md:text-xl leading-relaxed max-w-3xl pb-8 md:pb-10 pr-16">
-                          {f.a}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* Answers stay in the HTML while collapsed so search engines and AI crawlers can read them. */}
+                  <motion.div
+                    initial={false}
+                    animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+                    transition={{ duration: 0.5, ease: EASE }}
+                    className="overflow-hidden"
+                    inert={!isOpen}
+                  >
+                    <p className="text-ink-soft text-lg md:text-xl leading-relaxed max-w-3xl pb-8 md:pb-10 pr-16">
+                      {f.a}
+                    </p>
+                  </motion.div>
                 </div>
               </Reveal>
             );

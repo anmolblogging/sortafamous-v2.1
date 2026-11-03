@@ -115,8 +115,10 @@ export function Hero() {
                   same baseline as the left column (7vh above the grid bottom) */}
               <div className="absolute inset-0 lg:top-[6vh] lg:bottom-[7vh]">
                 <motion.img
-                  src="/rightside%20img.png"
-                  alt="Sorta Famous, editorial portrait"
+                  src="/hero-bust.webp"
+                  width={900}
+                  height={1350}
+                  alt="Classical marble bust wearing headphones and sunglasses, wrapped in Sorta Famous ribbons"
                   className="h-full w-full object-contain object-bottom"
                   fetchPriority="high"
                   initial={{ opacity: 0, scale: 1.06, filter: "blur(16px)" }}

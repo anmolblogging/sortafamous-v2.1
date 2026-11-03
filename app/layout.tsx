@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 import { WhatsAppWidget } from "@/components/WhatsAppWidget";
+import { GA_MEASUREMENT_ID, SITE_URL, ogDefaults, organizationSchema } from "@/lib/site";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -25,7 +26,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sortafamous.in"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Sorta Famous · 360° Marketing & PR Agency in India",
     template: "%s · Sorta Famous",
@@ -33,11 +34,12 @@ export const metadata: Metadata = {
   description:
     "Fame is earned. We manage the rest. Insight led 360° marketing, PR, brand, social and content, visibility that lasts longer than the news cycle.",
   openGraph: {
+    ...ogDefaults,
     title: "Sorta Famous · 360° Marketing & PR Agency",
     description:
       "Visibility that lasts longer than the news cycle, no clout chasing, just status with substance.",
-    type: "website",
   },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({
@@ -50,16 +52,21 @@ export default function RootLayout({
       lang="en"
       className={`${geist.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        />
-      </head>
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');`}
+        </Script>
         <Script
           id="meta-pixel"
           strategy="afterInteractive"

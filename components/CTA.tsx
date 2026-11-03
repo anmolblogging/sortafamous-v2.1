@@ -12,7 +12,7 @@ export function CTA() {
           <Parallax amount={40} className="absolute inset-0">
             <img
               src="/images/art/cta1.jpg"
-              alt=""
+              alt="Classical landscape painting of riverside ruins under a wide sky"
               loading="lazy"
               className="h-[120%] w-full object-cover opacity-30"
             />

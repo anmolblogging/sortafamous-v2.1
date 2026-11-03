@@ -4,6 +4,52 @@ import { Nav } from '@/components/Nav';
 import { CTA } from '@/components/CTA';
 import { Footer } from '@/components/Footer';
 import { getBlogPostBySlug, getBlogPosts, type BlogPost } from '@/lib/blogs';
+import { OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/site';
+
+/** BlogPosting + BreadcrumbList for a post, using the URLs it actually has on this site. */
+function postSchema(post: BlogPost) {
+  const url = `${SITE_URL}/${post.slug}`;
+  const category = post.categories?.[0];
+  const modified = post.modifiedDate > post.publishedDate ? post.modifiedDate : post.publishedDate;
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        '@id': `${url}#article`,
+        headline: post.title,
+        description: post.seo?.description || post.excerpt,
+        url,
+        mainEntityOfPage: url,
+        datePublished: post.publishedDate,
+        dateModified: modified,
+        ...(post.featuredImageUrl && { image: post.featuredImageUrl }),
+        author: { '@type': 'Person', name: post.author.name },
+        publisher: { '@id': `${SITE_URL}/#organization` },
+        ...(category && { articleSection: category.name }),
+        ...(post.tags?.length && { keywords: post.tags.map((t) => t.name).join(', ') }),
+        inLanguage: 'en-IN',
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_URL}/blog` },
+          ...(category
+            ? [{ '@type': 'ListItem', position: 3, name: category.name, item: `${SITE_URL}/category/${category.slug}` }]
+            : []),
+          { '@type': 'ListItem', position: category ? 4 : 3, name: post.title, item: url },
+        ],
+      },
+      {
+        '@type': 'ProfessionalService',
+        '@id': `${SITE_URL}/#organization`,
+        name: SITE_NAME,
+        url: SITE_URL,
+      },
+    ],
+  };
+}
 
 export async function generateStaticParams() {
   const { posts } = await getBlogPosts({ perPage: 100 });
@@ -23,12 +69,15 @@ export async function generateMetadata({
     title: seo?.title || post.title,
     description: seo?.description || post.excerpt,
     keywords: seo?.keywords,
-    alternates: { canonical: seo?.canonicalUrl || `https://sortafamous.in/${post.slug}` },
+    alternates: { canonical: `/${post.slug}` },
     openGraph: {
       title: seo?.ogTitle || post.title,
       description: seo?.ogDescription || post.excerpt,
       type: 'article',
-      images: seo?.ogImage ? [{ url: seo.ogImage, width: 1200, height: 630 }] : [],
+      url: `/${post.slug}`,
+      publishedTime: post.publishedDate,
+      authors: [post.author.name],
+      images: [seo?.ogImage || post.featuredImageUrl || OG_IMAGE],
     },
   };
 }
@@ -54,9 +103,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     <div className="bg-cream text-ink overflow-x-clip min-h-screen flex flex-col">
       <Nav />
       <main className="flex-grow">
-        {post.seo?.schema && (
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(post.seo.schema) }} />
-        )}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(postSchema(post)) }} />
         
         <div className="px-6 md:px-12 lg:px-16 xl:px-28">
           <div className="mx-auto grid max-w-[1480px] gap-16 pt-32 pb-16 md:pt-40 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-16 xl:gap-24">
