@@ -83,9 +83,8 @@ export async function getBlogPosts(options?: {
   if (options?.tagId) url += `&tags=${options.tagId}`;
   if (options?.search) url += `&search=${encodeURIComponent(options.search)}`;
  
-  let res = await fetch(url, { next: { revalidate: 60 } }).catch(() => null);
-  if (!res?.ok) res = await fetch(url, { next: { revalidate: 60 } }).catch(() => null);
-  if (!res?.ok) return { posts: [], total: 0, totalPages: 0 };
+  const res = await fetchCms(url).catch(() => null);
+  if (!res) return { posts: [], total: 0, totalPages: 0 };
  
   const total = Number(res.headers.get('X-WP-Total') || 0);
   const totalPages = Number(res.headers.get('X-WP-TotalPages') || 1);
@@ -93,20 +92,26 @@ export async function getBlogPosts(options?: {
  
   return { posts: raw.map(normalizePost), total, totalPages };
 }
- 
-export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
-  const url = `${WP_API_BASE}/posts?_embed=1&slug=${encodeURIComponent(slug)}`;
-  // A CMS hiccup must not be cached as a 404 for a real post, so retry, then
-  // throw: a failed build or revalidation keeps serving the last good page.
+
+/**
+ * The CMS is on shared hosting that answers bursts of requests with 508
+ * (resource limit), so requests retry with back-off and then throw. Throwing
+ * matters: a failed build or revalidation keeps serving the last good page
+ * instead of caching a 404 for a real post.
+ */
+async function fetchCms(url: string): Promise<Response> {
   for (let attempt = 1; ; attempt++) {
     const res = await fetch(url, { next: { revalidate: 60 } }).catch(() => null);
-    if (res?.ok) {
-      const raw = await res.json();
-      return raw.length ? normalizePost(raw[0]) : null;
-    }
-    if (attempt === 3) throw new Error(`CMS request failed for post "${slug}" (${res?.status ?? 'network error'})`);
-    await new Promise((r) => setTimeout(r, 500 * attempt));
+    if (res?.ok) return res;
+    if (attempt === 5) throw new Error(`CMS request failed (${res?.status ?? 'network error'}): ${url}`);
+    await new Promise((r) => setTimeout(r, 1000 * 2 ** (attempt - 1)));
   }
+}
+ 
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const res = await fetchCms(`${WP_API_BASE}/posts?_embed=1&slug=${encodeURIComponent(slug)}`);
+  const raw = await res.json();
+  return raw.length ? normalizePost(raw[0]) : null;
 }
 
 function formatDate(iso?: string | null): string {
@@ -207,6 +212,8 @@ export function categoriesFromPosts(posts: BlogPost[]): TaxonomyTerm[] {
   return [...counts.values()].sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
 }
 
+const SITE_NAME_SUFFIX = /\s*[-|–·]\s*(Sorta Famous|CMS|cms\.sortafamous\.in)\s*$/i;
+
 // Canonical URLs and structured data are built on the site from the post slug
 // (see app/[slug]/page.tsx). The CMS versions use the WordPress permalink
 // structure, /category/slug/, which does not exist on sortafamous.in.
@@ -215,8 +222,9 @@ export function extractSeo(item: any, fallbackTitle = '', fallbackDesc = ''): SE
   const meta = item?.aioseo_meta_data || {};
  
   let title = stripHtml(head.title || meta.title || fallbackTitle);
-  // AIOSEO appends the WordPress site name ("CMS") to some titles.
-  title = title.replace(/\s*[-|–]\s*(CMS|cms\.sortafamous\.in)\s*$/i, '');
+  // AIOSEO appends the WordPress site name to some titles; the layout's title
+  // template already adds "· Sorta Famous".
+  title = title.replace(SITE_NAME_SUFFIX, '');
  
   const description = stripHtml(head.description || meta.description || fallbackDesc).slice(0, 160);
  
@@ -224,7 +232,7 @@ export function extractSeo(item: any, fallbackTitle = '', fallbackDesc = ''): SE
     title,
     description,
     keywords: typeof head.keywords === 'string' && head.keywords ? head.keywords : undefined,
-    ogTitle: stripHtml(head['og:title'] || title).replace(/\s*[-|–]\s*CMS\s*$/i, ''),
+    ogTitle: stripHtml(head['og:title'] || title).replace(SITE_NAME_SUFFIX, ''),
     ogDescription: head['og:description'] || description,
     ogImage: head['og:image'],
   };

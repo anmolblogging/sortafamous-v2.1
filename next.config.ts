@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // The WordPress CMS is on shared hosting that returns 508 when a build hits
+  // it with many parallel requests, so pages are generated a few at a time.
+  experimental: {
+    staticGenerationMaxConcurrency: 2,
+    staticGenerationMinPagesPerWorker: 100,
+    staticGenerationRetryCount: 2,
+  },
   async redirects() {
     return [
       // One canonical host: www.sortafamous.in otherwise serves a duplicate copy.
