@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { pageSchema, postListSchema, seoDescription, seoTitle } from '@/lib/seo';
 import { ogDefaults } from '@/lib/site';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -13,6 +15,10 @@ export async function generateStaticParams() {
   return categories.map((c) => ({ slug: c.slug }));
 }
 
+function categoryDescription(name: string) {
+  return seoDescription(`${name} guides and articles for founders, brands and businesses in India, from the Sorta Famous team in Mumbai.`);
+}
+
 export async function generateMetadata({
   params,
 }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -22,8 +28,9 @@ export async function generateMetadata({
   if (!currentCategory) return { title: 'Category Not Found' };
   
   return {
-    title: `${currentCategory.name} · Blog`,
-    description: `${currentCategory.name} guides and articles for founders, brands and businesses in India, from the Sorta Famous team in Mumbai.`,
+    title: seoTitle(`${currentCategory.name} Articles & Guides`),
+    description: categoryDescription(currentCategory.name),
+    keywords: [currentCategory.name, `${currentCategory.name} India`, `${currentCategory.name} guide`, `${currentCategory.name} Mumbai`, 'Sorta Famous blog'],
     alternates: { canonical: `/category/${currentCategory.slug}` },
     openGraph: { ...ogDefaults, url: `/category/${currentCategory.slug}`, title: `${currentCategory.name} · Sorta Famous Blog` },
   };
@@ -57,6 +64,19 @@ export default async function CategoryPage({
     <div className="bg-cream text-ink overflow-x-clip min-h-screen flex flex-col">
       <Nav />
       <main className="flex-grow pt-32 md:pt-40 px-6 md:px-12 lg:px-16 xl:px-28">
+        <JsonLd
+          data={pageSchema({
+            type: 'CollectionPage',
+            path: `/category/${currentCategory.slug}`,
+            name: `${currentCategory.name} articles`,
+            description: categoryDescription(currentCategory.name),
+            crumbs: [
+              { name: 'Blog', path: '/blog' },
+              { name: currentCategory.name, path: `/category/${currentCategory.slug}` },
+            ],
+            extra: [postListSchema(posts)],
+          })}
+        />
         <div className="mx-auto max-w-5xl">
           <h1 className="serif text-[clamp(3rem,6vw,5rem)] leading-none tracking-[-0.02em] mb-8">
             {currentCategory.name}

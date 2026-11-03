@@ -28,7 +28,6 @@ export const BUSINESS = {
 export const OG_IMAGE = { url: "/og-default.jpg", width: 1200, height: 630, alt: "Sorta Famous · 360° Marketing & PR Agency" };
 
 export const organizationSchema = {
-  "@context": "https://schema.org",
   "@type": "ProfessionalService",
   "@id": `${SITE_URL}/#organization`,
   name: BUSINESS.name,

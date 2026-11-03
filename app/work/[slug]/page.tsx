@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { ogDefaults } from "@/lib/site";
+import { JsonLd } from "@/components/JsonLd";
+import { pageSchema, seoDescription, seoTitle } from "@/lib/seo";
+import { SITE_URL, ogDefaults } from "@/lib/site";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
@@ -21,14 +23,15 @@ export async function generateMetadata({
   const study = getCase(slug);
   if (!study) return { title: "Case not found" };
   return {
-    title: `${study.client} · ${study.t}`,
-    description: study.summary,
+    title: seoTitle(`${study.client} · ${study.t}`),
+    description: seoDescription(study.summary),
+    keywords: [study.client, `${study.client} case study`, ...study.services, "PR case study India", "Sorta Famous work"],
     alternates: { canonical: `/work/${study.slug}` },
     openGraph: {
       ...ogDefaults,
       url: `/work/${study.slug}`,
       title: `${study.client} · Sorta Famous`,
-      description: study.summary,
+      description: seoDescription(study.summary),
       images: [study.cover],
     },
   };
@@ -58,6 +61,27 @@ export default async function CasePage({
     <div className="bg-cream text-ink overflow-x-clip">
       <Nav />
       <main className="px-6 md:px-12 lg:px-16 xl:px-28">
+        <JsonLd
+          data={pageSchema({
+            path: `/work/${study.slug}`,
+            name: `${study.client} · ${study.t}`,
+            description: seoDescription(study.summary),
+            crumbs: [
+              { name: "Selected work", path: "/#work" },
+              { name: study.client, path: `/work/${study.slug}` },
+            ],
+            extra: [
+              {
+                "@type": "CreativeWork",
+                name: `${study.client}: ${study.t}`,
+                description: study.summary,
+                image: `${SITE_URL}${study.cover}`,
+                creator: { "@id": `${SITE_URL}/#organization` },
+                about: study.services,
+              },
+            ],
+          })}
+        />
         <div className="mx-auto max-w-[1480px] pt-32 pb-20 md:pt-40 md:pb-28">
           <Link
             href="/#work"

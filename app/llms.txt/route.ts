@@ -3,10 +3,11 @@ import { cases } from "@/lib/cases";
 import { BUSINESS, SITE_URL } from "@/lib/site";
 
 // llms.txt (https://llmstxt.org): a plain-markdown map of the site for AI crawlers.
-export const revalidate = 3600;
+export const revalidate = 600;
 
 export async function GET() {
   const { posts } = await getBlogPosts({ perPage: 100 });
+  if (!posts.length) throw new Error("llms.txt: no posts returned from the CMS");
   const a = BUSINESS.address;
 
   const body = `# Sorta Famous

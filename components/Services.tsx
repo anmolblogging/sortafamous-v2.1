@@ -170,7 +170,7 @@ export function Services() {
                       nears the viewport, so the real one is a cache hit. */}
                   <img
                     src={s.img}
-                    alt=""
+                    alt={`${s.t} at Sorta Famous`}
                     aria-hidden
                     loading="lazy"
                     decoding="async"

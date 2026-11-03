@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { ogDefaults } from "@/lib/site";
+import { pageSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 import { Preloader } from "@/components/Preloader";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
@@ -23,15 +25,19 @@ import { FAQ } from "@/components/FAQ";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 
+const DESCRIPTION =
+  "PR and 360° marketing agency in Mumbai. Public relations, social media, branding and performance marketing that earns visibility beyond the news cycle.";
+
 export const metadata: Metadata = {
   title: { absolute: "Sorta Famous · PR & 360° Marketing Agency in Mumbai, India" },
-  description: "PR and 360° marketing agency in Mumbai. Public relations, social media, branding and performance marketing that earns visibility beyond the news cycle.",
+  description: DESCRIPTION,
+  keywords: ["PR agency in Mumbai", "marketing agency in Mumbai", "360 marketing agency", "public relations agency India", "social media marketing agency Mumbai", "brand management agency", "performance marketing agency", "personal branding agency"],
   alternates: { canonical: "/" },
   openGraph: {
     ...ogDefaults,
     url: "/",
-    title: "Sorta Famous · 360° Marketing & PR Agency",
-    description: "Visibility that lasts longer than the news cycle, no clout chasing, just status with substance.",
+    title: "Sorta Famous · PR & 360° Marketing Agency in Mumbai",
+    description: DESCRIPTION,
   },
 };
 
@@ -41,6 +47,7 @@ export default function Home() {
       <Preloader />
       <Nav />
       <main>
+        <JsonLd data={pageSchema({ path: "", name: "Sorta Famous · PR & 360° Marketing Agency in Mumbai, India", description: DESCRIPTION, crumbs: [] })} />
         <Hero />
         {/* Wrapper makes following sections scroll OVER the sticky hero like a blanket */}
         <div className="relative z-10 bg-cream">

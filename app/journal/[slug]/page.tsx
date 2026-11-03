@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { ogDefaults } from "@/lib/site";
+import { JsonLd } from "@/components/JsonLd";
+import { pageSchema, seoDescription, seoTitle } from "@/lib/seo";
+import { SITE_URL, ogDefaults } from "@/lib/site";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
 import { CTA } from "@/components/CTA";
@@ -19,15 +21,16 @@ export async function generateMetadata({
   const article = getArticle(slug);
   if (!article) return { title: "Article not found" };
   return {
-    title: article.title,
-    description: article.excerpt,
+    title: seoTitle(article.title),
+    description: seoDescription(article.excerpt),
+    keywords: [article.tag, `${article.tag} India`, "Sorta Famous journal"],
     alternates: { canonical: `/journal/${article.slug}` },
     openGraph: {
       ...ogDefaults,
       type: "article",
       url: `/journal/${article.slug}`,
       title: `${article.title} · Sorta Famous`,
-      description: article.excerpt,
+      description: seoDescription(article.excerpt),
       images: [article.img],
     },
   };
@@ -46,6 +49,29 @@ export default async function ArticlePage({
     <div className="bg-cream text-ink overflow-x-clip">
       <Nav />
       <main>
+        <JsonLd
+          data={pageSchema({
+            path: `/journal/${article.slug}`,
+            name: article.title,
+            description: seoDescription(article.excerpt),
+            crumbs: [
+              { name: "Blog", path: "/blog" },
+              { name: article.title, path: `/journal/${article.slug}` },
+            ],
+            extra: [
+              {
+                "@type": "Article",
+                headline: article.title,
+                description: article.excerpt,
+                image: `${SITE_URL}${article.img}`,
+                datePublished: new Date(article.date).toISOString(),
+                author: { "@type": "Organization", name: article.author },
+                publisher: { "@id": `${SITE_URL}/#organization` },
+                mainEntityOfPage: `${SITE_URL}/journal/${article.slug}`,
+              },
+            ],
+          })}
+        />
         <article className="px-6 md:px-12 lg:px-16 xl:px-28">
           <div className="mx-auto max-w-3xl pt-32 md:pt-40">
             <a

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { pageSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 import { ogDefaults } from "@/lib/site";
 import { LegalPage, LegalLink, type LegalSection } from "@/components/LegalPage";
 import { GRIEVANCE_OFFICER, LEGAL_ADDRESS, LEGAL_EMAIL, LEGAL_LAST_UPDATED } from "@/lib/legal";
@@ -7,6 +9,7 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "How Sorta Famous collects, uses, stores, discloses and protects personal data when you use our website or interact with us.",
+  keywords: ["Sorta Famous privacy policy", "privacy policy"],
   alternates: { canonical: "/privacy-policy" },
   openGraph: { ...ogDefaults, url: "/privacy-policy", title: "Privacy Policy · Sorta Famous" },
 };
@@ -458,6 +461,8 @@ const sections: LegalSection[] = [
 
 export default function PrivacyPolicyPage() {
   return (
+    <>
+      <JsonLd data={pageSchema({ path: "/privacy-policy", name: "Privacy Policy", description: String(metadata.description), crumbs: [{ name: "Privacy Policy", path: "/privacy-policy" }] })} />
     <LegalPage
       eyebrow="Privacy Policy"
       title="Your data,"
@@ -466,5 +471,6 @@ export default function PrivacyPolicyPage() {
       intro="How we collect, use, store and protect personal data when you visit our website, get in touch, or work with us."
       sections={sections}
     />
+    </>
   );
 }

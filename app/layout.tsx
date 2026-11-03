@@ -3,6 +3,8 @@ import { Geist, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 import { WhatsAppWidget } from "@/components/WhatsAppWidget";
 import { GA_MEASUREMENT_ID, SITE_URL, ogDefaults, organizationSchema } from "@/lib/site";
+import { websiteSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -49,14 +51,18 @@ export default function RootLayout({
 }>) {
   return (
     <html
+      suppressHydrationWarning
       lang="en"
       className={`${geist.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/* Hides the intro loader before first paint on repeat views in a session. */}
         <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          dangerouslySetInnerHTML={{
+            __html: `try{if(sessionStorage.getItem("sf:intro-seen")==="1")document.documentElement.dataset.introSeen="1"}catch(e){}`,
+          }}
         />
+        <JsonLd data={{ "@context": "https://schema.org", "@graph": [organizationSchema, websiteSchema] }} />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
           strategy="afterInteractive"
@@ -91,7 +97,7 @@ export default function RootLayout({
             width="1"
             style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=917020514406906&ev=PageView&noscript=1"
-            alt=""
+            alt="Meta Pixel"
           />
         </noscript>
         {children}

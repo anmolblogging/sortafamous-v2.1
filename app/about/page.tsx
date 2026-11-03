@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { ogDefaults } from "@/lib/site";
+import { pageSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 import { Nav } from "@/components/Nav";
 import { AboutHero } from "@/components/AboutHero";
 import { AboutManifesto } from "@/components/AboutManifesto";
@@ -11,17 +13,19 @@ import { AboutNote } from "@/components/AboutNote";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
 
+const DESCRIPTION =
+  "Sorta Famous is a Mumbai PR and marketing agency helping founders and brands shape perception, build authority and earn visibility that lasts.";
+
 export const metadata: Metadata = {
-  title: "About us",
-  description:
-    "At Sorta Famous, fame is earned, not accidental. A modern PR, marketing and SEO studio helping brands shape perception, build authority, and create visibility that lasts.",
+  title: "About Us · PR & Marketing Agency in Mumbai",
+  description: DESCRIPTION,
+  keywords: ["about Sorta Famous", "PR agency Mumbai", "marketing agency Mumbai", "brand reputation agency", "PR and marketing studio India"],
   alternates: { canonical: "/about" },
   openGraph: {
     ...ogDefaults,
     url: "/about",
-    title: "About us · Sorta Famous",
-    description:
-      "Creating meaningful visibility for modern brands, strategy over shortcuts, visibility with substance, reputation that lasts.",
+    title: "About Sorta Famous · PR & Marketing Agency in Mumbai",
+    description: DESCRIPTION,
   },
 };
 
@@ -30,6 +34,7 @@ export default function AboutPage() {
     <div className="bg-cream text-ink overflow-x-clip">
       <Nav />
       <main>
+        <JsonLd data={pageSchema({ type: "AboutPage", path: "/about", name: "About Sorta Famous", description: DESCRIPTION, crumbs: [{ name: "About", path: "/about" }] })} />
         <AboutHero />
         {/* Values take the slot the "By the numbers" stats used to hold */}
         <AboutValues />

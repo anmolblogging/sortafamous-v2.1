@@ -129,3 +129,14 @@
 @media (prefers-reduced-motion: reduce) {
   .reveal, .rise { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
 }
+
+/* Intro loader: skipped on repeat views in a session (flag set by an inline
+   script in app/layout.tsx) and for visitors who prefer reduced motion. */
+html[data-intro-seen] .sf-preloader {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sf-preloader {
+    display: none;
+  }
+}

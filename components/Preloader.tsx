@@ -5,10 +5,30 @@ import { useEffect, useState } from "react";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+/** sessionStorage key; also read by the inline script in app/layout.tsx. */
+export const INTRO_SEEN_KEY = "sf:intro-seen";
+
+/**
+ * Brand intro shown once per visit. It sits over the page rather than holding
+ * it back: the hero underneath is server-rendered and painted at full opacity
+ * straight away, so search engines and Core Web Vitals see the real content.
+ * Repeat views in the same session, and visitors who prefer reduced motion,
+ * skip it (CSS hides it before paint, see globals.css).
+ */
 export function Preloader() {
   const [done, setDone] = useState(false);
+  const [skip, setSkip] = useState(false);
 
   useEffect(() => {
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(INTRO_SEEN_KEY) === "1";
+      sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+    } catch {}
+    if (seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSkip(true);
+      return;
+    }
     // lock scroll while the intro plays
     document.body.style.overflow = "hidden";
     const t = setTimeout(() => setDone(true), 1900);
@@ -18,12 +38,14 @@ export function Preloader() {
     };
   }, []);
 
+  if (skip) return null;
+
   return (
     <AnimatePresence>
       {!done && (
         <motion.div
           key="preloader"
-          className="fixed inset-0 z-[200] bg-cream flex flex-col items-center justify-center gap-7 px-6"
+          className="sf-preloader fixed inset-0 z-[200] bg-cream flex flex-col items-center justify-center gap-7 px-6"
           initial={{ y: 0 }}
           exit={{ y: "-100%" }}
           transition={{ duration: 0.9, ease: EASE }}

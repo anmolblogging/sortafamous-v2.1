@@ -45,7 +45,7 @@ export interface Author {
 export interface SEOData {
   title?: string;
   description?: string;
-  keywords?: string;
+  keywords?: string[];
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
@@ -231,7 +231,10 @@ export function extractSeo(item: any, fallbackTitle = '', fallbackDesc = ''): SE
   return {
     title,
     description,
-    keywords: typeof head.keywords === 'string' && head.keywords ? head.keywords : undefined,
+    // Focus keywords entered in AIOSEO's post editor.
+    keywords: Array.isArray(meta.keywords)
+      ? meta.keywords.map((k: any) => stripHtml(k?.value || k?.label || '')).filter(Boolean)
+      : undefined,
     ogTitle: stripHtml(head['og:title'] || title).replace(SITE_NAME_SUFFIX, ''),
     ogDescription: head['og:description'] || description,
     ogImage: head['og:image'],

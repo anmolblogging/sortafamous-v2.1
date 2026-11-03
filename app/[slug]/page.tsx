@@ -5,6 +5,13 @@ import { CTA } from '@/components/CTA';
 import { Footer } from '@/components/Footer';
 import { getBlogPostBySlug, getBlogPosts, type BlogPost } from '@/lib/blogs';
 import { OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/site';
+import { seoDescription, seoTitle } from '@/lib/seo';
+import { JsonLd } from '@/components/JsonLd';
+
+/** AIOSEO focus keywords, falling back to the post's tags. */
+function postKeywords(post: BlogPost): string[] {
+  return post.seo?.keywords?.length ? post.seo.keywords : (post.tags ?? []).map((t) => t.name);
+}
 
 /** BlogPosting + BreadcrumbList for a post, using the URLs it actually has on this site. */
 function postSchema(post: BlogPost) {
@@ -18,7 +25,7 @@ function postSchema(post: BlogPost) {
         '@type': 'BlogPosting',
         '@id': `${url}#article`,
         headline: post.title,
-        description: post.seo?.description || post.excerpt,
+        description: seoDescription(post.seo?.description || post.excerpt),
         url,
         mainEntityOfPage: url,
         datePublished: post.publishedDate,
@@ -27,7 +34,7 @@ function postSchema(post: BlogPost) {
         author: { '@type': 'Person', name: post.author.name },
         publisher: { '@id': `${SITE_URL}/#organization` },
         ...(category && { articleSection: category.name }),
-        ...(post.tags?.length && { keywords: post.tags.map((t) => t.name).join(', ') }),
+        ...(postKeywords(post).length && { keywords: postKeywords(post).join(', ') }),
         inLanguage: 'en-IN',
       },
       {
@@ -66,13 +73,13 @@ export async function generateMetadata({
   const seo = post.seo;
  
   return {
-    title: seo?.title || post.title,
-    description: seo?.description || post.excerpt,
-    keywords: seo?.keywords,
+    title: seoTitle(seo?.title || post.title),
+    description: seoDescription(seo?.description || post.excerpt),
+    keywords: postKeywords(post),
     alternates: { canonical: `/${post.slug}` },
     openGraph: {
       title: seo?.ogTitle || post.title,
-      description: seo?.ogDescription || post.excerpt,
+      description: seoDescription(seo?.ogDescription || post.excerpt),
       type: 'article',
       url: `/${post.slug}`,
       publishedTime: post.publishedDate,
@@ -103,7 +110,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     <div className="bg-cream text-ink overflow-x-clip min-h-screen flex flex-col">
       <Nav />
       <main className="flex-grow">
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(postSchema(post)) }} />
+        <JsonLd data={postSchema(post)} />
         
         <div className="px-6 md:px-12 lg:px-16 xl:px-28">
           <div className="mx-auto grid max-w-[1480px] gap-16 pt-32 pb-16 md:pt-40 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-16 xl:gap-24">
@@ -200,7 +207,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                           {r.featuredImageUrl ? (
                             <img
                               src={r.featuredImageUrl}
-                              alt=""
+                              alt={r.title}
                               loading="lazy"
                               className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                             />

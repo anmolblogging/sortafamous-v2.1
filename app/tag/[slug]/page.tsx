@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { seoDescription, seoTitle } from '@/lib/seo';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Nav } from '@/components/Nav';
@@ -21,8 +22,9 @@ export async function generateMetadata({
   if (!currentTag) return { title: 'Tag Not Found' };
   
   return {
-    title: `#${currentTag.name} · Blog`,
-    description: `Articles tagged ${currentTag.name} from the Sorta Famous team.`,
+    title: seoTitle(`#${currentTag.name} · Blog`),
+    description: seoDescription(`Articles tagged ${currentTag.name} from the Sorta Famous team in Mumbai.`),
+    keywords: [currentTag.name],
     alternates: { canonical: `/tag/${currentTag.slug}` },
     // Tag archives are thin lists that overlap the categories; keep them out
     // of the index but let crawlers follow through to the posts.

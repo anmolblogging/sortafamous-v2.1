@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { pageSchema, postListSchema } from '@/lib/seo';
 import { ogDefaults } from '@/lib/site';
 import Link from 'next/link';
 import { Nav } from '@/components/Nav';
@@ -7,12 +9,15 @@ import { Footer } from '@/components/Footer';
 import { getBlogPosts, getBlogCategories } from '@/lib/blogs';
 import { BlogList } from '@/components/BlogList';
 
+const BLOG_DESCRIPTION =
+  'Practical guides on PR, social media marketing, brand management, performance marketing and personal branding in India, from the Sorta Famous team in Mumbai.';
+
 export const metadata: Metadata = {
-  title: 'Blog',
-  description:
-    'Practical guides on PR, social media marketing, brand management, performance marketing and personal branding in India, from the Sorta Famous team in Mumbai.',
+  title: 'PR & Marketing Blog for Indian Brands',
+  description: BLOG_DESCRIPTION,
+  keywords: ['PR blog India', 'marketing blog India', 'social media marketing tips', 'brand management guides', 'personal branding tips', 'PR agency Mumbai blog'],
   alternates: { canonical: '/blog' },
-  openGraph: { ...ogDefaults, url: '/blog', title: 'Blog · Sorta Famous' },
+  openGraph: { ...ogDefaults, url: '/blog', title: 'PR & Marketing Blog · Sorta Famous', description: BLOG_DESCRIPTION },
 };
 
 export default async function BlogPage({
@@ -39,6 +44,16 @@ export default async function BlogPage({
     <div className="bg-cream text-ink overflow-x-clip min-h-screen flex flex-col">
       <Nav />
       <main className="flex-grow pt-32 md:pt-40 px-6 md:px-12 lg:px-16 xl:px-28">
+        <JsonLd
+          data={pageSchema({
+            type: 'CollectionPage',
+            path: '/blog',
+            name: 'Sorta Famous Blog',
+            description: BLOG_DESCRIPTION,
+            crumbs: [{ name: 'Blog', path: '/blog' }],
+            extra: [postListSchema(posts)],
+          })}
+        />
         <div className="mx-auto max-w-5xl">
           <h1 className="serif text-[clamp(3rem,6vw,5rem)] leading-none tracking-[-0.02em] mb-8">
             Blog

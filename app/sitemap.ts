@@ -4,8 +4,9 @@ import { articles } from "@/lib/articles";
 import { cases } from "@/lib/cases";
 import { SITE_URL } from "@/lib/site";
 
-// Rebuilt hourly so newly published CMS posts are picked up.
-export const revalidate = 3600;
+// Regenerated every 10 minutes, so a post published in WordPress appears here
+// (and its page goes live) without a redeploy.
+export const revalidate = 600;
 
 const pages: { path: string; priority: number; changeFrequency: "weekly" | "monthly" | "yearly" }[] = [
   { path: "", priority: 1, changeFrequency: "weekly" },
@@ -24,6 +25,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getBlogPosts({ perPage: 100 }),
     getBlogCategories(),
   ]);
+  // An empty list means the CMS failed; throwing keeps the last good sitemap
+  // instead of caching one with every blog post missing.
+  if (!posts.length) throw new Error("Sitemap: no posts returned from the CMS");
 
   return [
     ...pages.map((p) => ({

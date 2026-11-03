@@ -6,8 +6,11 @@ import { Magnetic } from "./motion";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+// No opacity fade: the hero text is the page's main content and must paint at
+// full opacity from the server HTML (Largest Contentful Paint). The intro
+// loader covers this animation on first view anyway.
 const rise = {
-  hidden: { opacity: 0, y: 26, filter: "blur(8px)" },
+  hidden: { opacity: 1, y: 26, filter: "blur(8px)" },
   show: (i: number) => ({
     opacity: 1,
     y: 0,
@@ -121,7 +124,7 @@ export function Hero() {
                   alt="Classical marble bust wearing headphones and sunglasses, wrapped in Sorta Famous ribbons"
                   className="h-full w-full object-contain object-bottom"
                   fetchPriority="high"
-                  initial={{ opacity: 0, scale: 1.06, filter: "blur(16px)" }}
+                  initial={{ opacity: 1, scale: 1.06, filter: "blur(16px)" }}
                   animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                   transition={{ duration: 1.2, ease: EASE, delay: 0.15 }}
                 />

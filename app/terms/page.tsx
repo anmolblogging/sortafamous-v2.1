@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { pageSchema } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 import { ogDefaults } from "@/lib/site";
 import { LegalPage, LegalLink, type LegalSection } from "@/components/LegalPage";
 import { LEGAL_ADDRESS, LEGAL_EMAIL, LEGAL_LAST_UPDATED } from "@/lib/legal";
@@ -7,6 +9,7 @@ export const metadata: Metadata = {
   title: "Terms of Use",
   description:
     "The terms that govern your access to and use of the Sorta Famous website, including content, intellectual property, disclaimers and liability.",
+  keywords: ["Sorta Famous terms of use", "terms of use"],
   alternates: { canonical: "/terms" },
   openGraph: { ...ogDefaults, url: "/terms", title: "Terms of Use · Sorta Famous" },
 };
@@ -683,6 +686,8 @@ const sections: LegalSection[] = [
 
 export default function TermsPage() {
   return (
+    <>
+      <JsonLd data={pageSchema({ path: "/terms", name: "Terms of Use", description: String(metadata.description), crumbs: [{ name: "Terms of Use", path: "/terms" }] })} />
     <LegalPage
       eyebrow="Terms of Use"
       title="The fine print,"
@@ -691,5 +696,6 @@ export default function TermsPage() {
       intro="The terms that govern your access to and use of the Sorta Famous website. Please read them carefully."
       sections={sections}
     />
+    </>
   );
 }
