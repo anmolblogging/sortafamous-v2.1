@@ -24,7 +24,7 @@ const pillars: Pillar[] = [
     Icon: Megaphone,
     t: "Public Relations (PR)",
     d: "Public relations that builds reputation, earns media attention, and strengthens your public image across digital and traditional platforms.",
-    img: "/images/services/public-relations.jpg",
+    img: "/images/services/public-relations.webp",
     feel: "So the right people say your name in the right rooms.",
     items: [
       { name: "Strategic PR solutions", desc: "Long term strategy that protects brand value, not just short term buzz." },
@@ -39,7 +39,7 @@ const pillars: Pillar[] = [
     Icon: Share2,
     t: "Social Media Marketing",
     d: "A clear plan, stories that make sense, and constant optimisation, social that connects with customers and grows your business.",
-    img: "/images/services/social-media-marketing.jpg",
+    img: "/images/services/social-media-marketing.webp",
     feel: "So the scroll stops, and the following becomes a community.",
     items: [
       { name: "Strategic social planning", desc: "Goals, audience and competitor research to find the right platforms." },
@@ -54,7 +54,7 @@ const pillars: Pillar[] = [
     Icon: Gem,
     t: "Brand Management",
     d: "Building, keeping and growing strong brands, rooted in clarity, consistency and long term business value.",
-    img: "/images/services/brand-management.jpg",
+    img: "/images/services/brand-management.webp",
     feel: "So people feel something the moment they meet you.",
     items: [
       { name: "Brand endorsement", desc: "Partnering with trusted creators, celebrities and industry voices to amplify your brand with authenticity." },
@@ -70,7 +70,7 @@ const pillars: Pillar[] = [
     Icon: Target,
     t: "Performance Marketing",
     d: "Data-driven marketing campaigns focused on generating qualified leads, increasing sales, and maximizing returns on every advertising dollar.",
-    img: "/images/services/performance-marketing.jpg",
+    img: "/images/services/performance-marketing.webp",
     feel: "Reach the right audience, increase conversions, and maximize every ad spend.",
     items: [
       { name: "Performance marketing strategy", desc: "Growth-focused strategies built around your business goals, audience, and measurable KPIs." },
@@ -85,7 +85,7 @@ const pillars: Pillar[] = [
     Icon: UserRound,
     t: "Personal Branding",
     d: "Strategic personal branding focused on building credibility, growing influence, and creating meaningful opportunities across digital platforms.",
-    img: "/images/services/personal-branding.jpg",
+    img: "/images/services/personal-branding.webp",
     feel: "Build trust, attract opportunities, and stand out as an industry leader.",
     items: [
       { name: "Personal brand strategy", desc: "A clear brand identity, positioning, messaging and growth roadmap aligned with your goals." },

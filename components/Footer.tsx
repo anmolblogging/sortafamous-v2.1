@@ -1,6 +1,7 @@
 import { ArrowRight, Mail, Phone, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Clock } from "./Clock";
+import { MapEmbed } from "./MapEmbed";
 
 const nav = [
   { href: "/", label: "Home" },
@@ -140,17 +141,8 @@ export function Footer() {
               </div>
             </div>
 
-            <div className="w-full h-44 rounded-2xl overflow-hidden border border-cream/10 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-              <iframe
-                title="Sorta Famous Location Map"
-                src={"https://maps.google.com/maps?q=" + encodeURIComponent("Sorta Famous, Patel Commercial Premises, 203, Off New Link Rd, opp. T-Series, above HDFC bank, Veera Desai Industrial Estate, Andheri West, Mumbai, Maharashtra 400053") + "&t=&z=15&ie=UTF8&iwloc=&output=embed"}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen={false}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+            <div className="w-full h-44 rounded-2xl overflow-hidden border border-cream/10 transition-all duration-300">
+              <MapEmbed />
             </div>
           </div>
         </div>

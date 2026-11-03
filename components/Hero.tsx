@@ -119,6 +119,8 @@ export function Hero() {
               <div className="absolute inset-0 lg:top-[6vh] lg:bottom-[7vh]">
                 <motion.img
                   src="/hero-bust.webp"
+                  srcSet="/hero-bust-600.webp 600w, /hero-bust.webp 900w"
+                  sizes="(min-width: 1024px) 40vw, 70vw"
                   width={900}
                   height={1350}
                   alt="Classical marble bust wearing headphones and sunglasses, wrapped in Sorta Famous ribbons"
