@@ -83,8 +83,7 @@ export async function getBlogPosts(options?: {
   if (options?.tagId) url += `&tags=${options.tagId}`;
   if (options?.search) url += `&search=${encodeURIComponent(options.search)}`;
  
-  const res = await fetchCms(url).catch(() => null);
-  if (!res) return { posts: [], total: 0, totalPages: 0 };
+  const res = await fetchCms(url);
  
   const total = Number(res.headers.get('X-WP-Total') || 0);
   const totalPages = Number(res.headers.get('X-WP-TotalPages') || 1);
@@ -101,7 +100,7 @@ export async function getBlogPosts(options?: {
  */
 async function fetchCms(url: string): Promise<Response> {
   for (let attempt = 1; ; attempt++) {
-    const res = await fetch(url, { next: { revalidate: 60 } }).catch(() => null);
+    const res = await fetch(url, { next: { revalidate: 86400 } }).catch(() => null);
     if (res?.ok) return res;
     if (attempt === 5) throw new Error(`CMS request failed (${res?.status ?? 'network error'}): ${url}`);
     await new Promise((r) => setTimeout(r, 1000 * 2 ** (attempt - 1)));
@@ -182,9 +181,9 @@ export function normalizePost(item: any): BlogPost {
 
 export async function getBlogCategories(): Promise<TaxonomyTerm[]> {
   const res = await fetch(`${WP_API_BASE}/categories?per_page=100&hide_empty=true`, {
-    next: { revalidate: 300 },
+    next: { revalidate: 86400 },
   });
-  if (!res.ok) return [];
+  if (!res.ok) throw new Error(`CMS categories request failed (${res.status})`);
   const raw = await res.json();
   return raw
     .map((c: any) => ({ id: c.id, name: stripHtml(c.name), slug: c.slug, count: c.count }))
@@ -193,9 +192,9 @@ export async function getBlogCategories(): Promise<TaxonomyTerm[]> {
 
 export async function getBlogTags(): Promise<TaxonomyTerm[]> {
   const res = await fetch(`${WP_API_BASE}/tags?per_page=100&hide_empty=true`, {
-    next: { revalidate: 300 },
+    next: { revalidate: 86400 },
   });
-  if (!res.ok) return [];
+  if (!res.ok) throw new Error(`CMS tags request failed (${res.status})`);
   const raw = await res.json();
   return raw.map((t: any) => ({ id: t.id, name: stripHtml(t.name), slug: t.slug, count: t.count }));
 }

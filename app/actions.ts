@@ -3,11 +3,16 @@
 import { getBlogPosts } from '@/lib/blogs';
 
 export async function loadMorePosts(page: number, categoryId?: number, tagId?: number, search?: string) {
-  const { posts } = await getBlogPosts({
-    page,
-    categoryId,
-    tagId,
-    search,
-  });
-  return { posts };
+  try {
+    const { posts } = await getBlogPosts({
+      page,
+      categoryId,
+      tagId,
+      search,
+    });
+    return { posts };
+  } catch {
+    // CMS unreachable: show no extra posts rather than an error.
+    return { posts: [] };
+  }
 }

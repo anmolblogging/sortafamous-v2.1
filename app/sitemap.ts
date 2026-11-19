@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/site";
 
 // Regenerated every 10 minutes, so a post published in WordPress appears here
 // (and its page goes live) without a redeploy.
-export const revalidate = 600;
+export const revalidate = 86400; // once a day; WordPress triggers instant updates via /api/revalidate
 
 const pages: { path: string; priority: number; changeFrequency: "weekly" | "monthly" | "yearly" }[] = [
   { path: "", priority: 1, changeFrequency: "weekly" },

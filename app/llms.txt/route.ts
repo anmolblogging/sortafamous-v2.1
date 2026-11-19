@@ -3,7 +3,7 @@ import { cases } from "@/lib/cases";
 import { BUSINESS, SITE_URL } from "@/lib/site";
 
 // llms.txt (https://llmstxt.org): a plain-markdown map of the site for AI crawlers.
-export const revalidate = 600;
+export const revalidate = 86400; // once a day; WordPress triggers instant updates via /api/revalidate
 
 export async function GET() {
   const { posts } = await getBlogPosts({ perPage: 100 });
